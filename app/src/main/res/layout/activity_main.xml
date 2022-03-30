@@ -19,11 +19,12 @@
 
         <EditText
             android:id="@+id/sendName"
+            android:text="菁9385"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@+id/wechatName"
-            android:text="测试" />
+            />
 
     </RelativeLayout>
 

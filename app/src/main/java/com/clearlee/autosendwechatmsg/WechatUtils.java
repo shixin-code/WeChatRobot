@@ -3,6 +3,7 @@ package com.clearlee.autosendwechatmsg;
 import android.accessibilityservice.AccessibilityService;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
  */
 public class WechatUtils {
 
+    private static final String TAG = "WechatUtils";
     public static String NAME;
     public static String CONTENT;
 
@@ -26,13 +28,16 @@ public class WechatUtils {
 
         AccessibilityNodeInfo accessibilityNodeInfo = accessibilityService.getRootInActiveWindow();
         if (accessibilityNodeInfo == null) {
+            Log.w(TAG, "findTextAndClick: cannot found active window!");
             return;
         }
 
         List<AccessibilityNodeInfo> nodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByText(text);
+        Log.d(TAG, "findTextAndClick: text=" + text + ", nodeInfoList count=" + nodeInfoList.size());
         if (nodeInfoList != null && !nodeInfoList.isEmpty()) {
             for (AccessibilityNodeInfo nodeInfo : nodeInfoList) {
                 if (nodeInfo != null && (text.equals(nodeInfo.getText()) || text.equals(nodeInfo.getContentDescription()))) {
+                    Log.d(TAG, "findTextAndClick: performClick node=" + nodeInfo.toString());
                     performClick(nodeInfo);
                     break;
                 }

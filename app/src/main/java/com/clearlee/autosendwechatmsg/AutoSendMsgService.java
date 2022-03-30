@@ -46,9 +46,15 @@ public class AutoSendMsgService extends AccessibilityService {
                 if (currentActivity.equals(WeChatTextWrapper.WechatClass.WECHAT_CLASS_LAUNCHUI)) {
                     handleFlow_LaunchUI();
                 } else if (currentActivity.equals(WeChatTextWrapper.WechatClass.WECHAT_CLASS_CONTACTINFOUI)) {
-                    handleFlow_ContactInfoUI();
+                    handleFlow_ContactInfoUI_for_delete();
                 } else if (currentActivity.equals(WeChatTextWrapper.WechatClass.WECHAT_CLASS_CHATUI)) {
                     handleFlow_ChatUI();
+                } else if(currentActivity.equals(WeChatTextWrapper.WechatClass.WECHAT_CLASS_PROFILESETTINGUI)) {
+                    handleFlow_ProfileSettingUI_for_delete();
+                } else if(currentActivity.equals(WeChatTextWrapper.WechatClass.WECHAT_CLASS_DELETE_CONFIRMUI)) {
+                    handleFlow_Delete_ConfirmUI();
+                } else {
+                    Log.d(TAG, "onAccessibilityEvent: currentActivity=" + currentActivity.toString());
                 }
             }
             break;
@@ -82,11 +88,33 @@ public class AutoSendMsgService extends AccessibilityService {
         }
     }
 
+
+
     private void handleFlow_ContactInfoUI() {
         WechatUtils.findTextAndClick(this, "发消息");
     }
+    private void handleFlow_ContactInfoUI_for_delete() {
+        Log.d(TAG, "handleFlow_ContactInfoUI_for_delete: go to more contact info page");
+        WechatUtils.findViewIdAndClick(this, WeChatTextWrapper.WechatId.WECHATID_CONTACTINFO_MORE_ID); // 进入更多信息界面
+    }
+    private void handleFlow_ProfileSettingUI_for_delete() {
+        //如果微信已经处于资料设置界面，需要判断当前联系人是不是需要发送的联系人
+        String curUserName = WechatUtils.findTextById(this, WeChatTextWrapper.WechatId.WECHAT_PROFILESETTING_SUMMARY_ID);
+        if (!TextUtils.isEmpty(curUserName) && curUserName.equals(WechatUtils.NAME)) {
+            WechatUtils.findTextAndClick(this, "删除");
+        }
+    }
+    private void handleFlow_Delete_ConfirmUI() {
+        // 弹出删除确认窗口，确认是否为需要删除的人
+        String content = WechatUtils.findTextById(this, WeChatTextWrapper.WechatId.WECHAT_DELETE_CONFIRM_CONTENT_ID);
+        final String targetContent = "将联系人“" + WechatUtils.NAME + "”删除，将同时删除与该联系人的聊天记录";
+        if (!TextUtils.isEmpty(content) && content.equals(targetContent)) {
+            WechatUtils.findTextAndClick(this, "删除"); // 确认删除
+        }
+    }
 
     private void handleFlow_LaunchUI() {
+        Log.d(TAG, "handleFlow_LaunchUI!");
 
         try {
             //点击通讯录，跳转到通讯录页面
@@ -120,7 +148,6 @@ public class AutoSendMsgService extends AccessibilityService {
      * @return
      */
     private AccessibilityNodeInfo TraversalAndFindContacts() {
-
         if (allNameList != null) allNameList.clear();
 
         AccessibilityNodeInfo rootNode = getRootInActiveWindow();
@@ -129,12 +156,14 @@ public class AutoSendMsgService extends AccessibilityService {
         //是否滚动到了底部
         boolean scrollToBottom = false;
         if (listview != null && !listview.isEmpty()) {
+            Log.d(TAG, "TraversalAndFindContacts: listview size=" + listview.size());
             while (true) {
                 //获取当前屏幕上的联系人信息
                 List<AccessibilityNodeInfo> nameList = rootNode.findAccessibilityNodeInfosByViewId(WeChatTextWrapper.WechatId.WECHATID_CONTACTUI_NAME_ID);
                 List<AccessibilityNodeInfo> itemList = rootNode.findAccessibilityNodeInfosByViewId(WeChatTextWrapper.WechatId.WECHATID_CONTACTUI_ITEM_ID);
 
                 if (nameList != null && !nameList.isEmpty()) {
+                    Log.w(TAG, "TraversalAndFindContacts: nameList size=" + nameList.size());
                     for (int i = 0; i < nameList.size(); i++) {
                         if (i == 0) {
                             //必须在一个循环内，防止翻页的时候名字发生重复
@@ -164,6 +193,8 @@ public class AutoSendMsgService extends AccessibilityService {
                             mRepeatCount++;
                         }
                     }
+                } else {
+                    Log.w(TAG, "TraversalAndFindContacts: not found namelist");
                 }
 
                 if (!scrollToBottom) {
@@ -180,6 +211,8 @@ public class AutoSendMsgService extends AccessibilityService {
                     e.printStackTrace();
                 }
             }
+        } else {
+            Log.w(TAG, "TraversalAndFindContacts: not found listview");
         }
         return null;
     }

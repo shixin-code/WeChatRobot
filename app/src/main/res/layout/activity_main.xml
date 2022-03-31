@@ -77,15 +77,37 @@
     </RelativeLayout>
 
     <TextView
-        android:id="@+id/testWechat"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="50dp"
-        android:background="#E63232"
+        android:layout_height="wrap_content"
+        android:text="联系人列表" />
+
+    <EditText
+        android:id="@+id/contactsList"
+        android:minLines="10"
+        android:gravity="top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        />
+
+    <LinearLayout
+        android:orientation="horizontal"
         android:gravity="center"
-        android:text="发送"
-        android:textColor="#ffffff" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btnListContacts"
+            android:text="列举联系人"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/btnDeleteContacts"
+            android:text="删除联系人"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
 
 </LinearLayout>

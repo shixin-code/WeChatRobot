@@ -6,7 +6,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -18,6 +21,8 @@ public class WechatUtils {
     private static final String TAG = "WechatUtils";
     public static String NAME;
     public static String CONTENT;
+    public static Set<String> names = new HashSet<String>();
+    public static Set<String> foundNames = new HashSet<String>();
 
     /**
      * 在当前页面查找文字内容并点击

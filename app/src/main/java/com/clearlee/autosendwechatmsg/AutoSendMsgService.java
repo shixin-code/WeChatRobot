@@ -21,6 +21,10 @@ public class AutoSendMsgService extends AccessibilityService {
     private List<String> allNameList = new ArrayList<>();
     private int mRepeatCount;
 
+    enum Status {
+        StatusNone, StatusListing, StatusDeleting
+    }
+    public static Status status = Status.StatusNone;
     public static boolean hasSend;
     public static final int SEND_FAIL = 0;
     public static final int SEND_SUCCESS = 1;
@@ -33,16 +37,11 @@ public class AutoSendMsgService extends AccessibilityService {
      */
     @Override
     public void onAccessibilityEvent(final AccessibilityEvent event) {
+        if(status.equals(Status.StatusNone)) return;
         int eventType = event.getEventType();
         switch (eventType) {
             case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED: {
-
                 String currentActivity = event.getClassName().toString();
-
-                if (hasSend) {
-                    return;
-                }
-
                 if (currentActivity.equals(WeChatTextWrapper.WechatClass.WECHAT_CLASS_LAUNCHUI)) {
                     handleFlow_LaunchUI();
                 } else if (currentActivity.equals(WeChatTextWrapper.WechatClass.WECHAT_CLASS_CONTACTINFOUI)) {
@@ -129,6 +128,11 @@ public class AutoSendMsgService extends AccessibilityService {
 
             //遍历通讯录联系人列表，查找联系人
             AccessibilityNodeInfo itemInfo = TraversalAndFindContacts();
+            if(status.equals(Status.StatusListing)){
+                status = Status.StatusNone;
+                resetAndReturnApp();
+                return;
+            }
             if (itemInfo != null) {
                 WechatUtils.performClick(itemInfo);
             } else {
@@ -173,19 +177,21 @@ public class AutoSendMsgService extends AccessibilityService {
                         AccessibilityNodeInfo nodeInfo = nameList.get(i);
                         String nickname = nodeInfo.getText().toString();
                         Log.d(TAG, "nickname = " + nickname);
-                        if (nickname.equals(WechatUtils.NAME)) {
-                            return itemInfo;
+                        if(status == Status.StatusDeleting){
+                            if(WechatUtils.names.contains(nickname)) {
+                                return itemInfo; // 返回继续删除操作
+                            }
+                        } else {
+                            WechatUtils.foundNames.add(nickname);
                         }
+
                         if (!allNameList.contains(nickname)) {
                             allNameList.add(nickname);
-                        } else if (allNameList.contains(nickname)) {
+                        } else {
                             Log.d(TAG, "mRepeatCount = " + mRepeatCount);
                             if (mRepeatCount == 3) {
-                                //表示已经滑动到顶部了
+                                //表示已经滑动到底部了
                                 if (scrollToBottom) {
-                                    Log.d(TAG, "没有找到联系人");
-                                    //此次发消息操作已经完成
-                                    hasSend = true;
                                     return null;
                                 }
                                 scrollToBottom = true;

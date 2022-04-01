@@ -10,6 +10,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Handler;
 
 /**
  * Created by Clearlee
@@ -20,6 +21,7 @@ public class AutoSendMsgService extends AccessibilityService {
     private static final String TAG = "AutoSendMsgService";
     private List<String> allNameList = new ArrayList<>();
     private int mRepeatCount;
+    private boolean enterSettingMemoPage = false;
 
     enum Status {
         StatusNone, StatusListing, StatusDeleting
@@ -42,6 +44,7 @@ public class AutoSendMsgService extends AccessibilityService {
         switch (eventType) {
             case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED: {
                 String currentActivity = event.getClassName().toString();
+                Log.d(TAG, "onAccessibilityEvent: currentActivity=" + currentActivity.toString());
                 if (currentActivity.equals(WeChatTextWrapper.WechatClass.WECHAT_CLASS_LAUNCHUI)) {
                     handleFlow_LaunchUI();
                 } else if (currentActivity.equals(WeChatTextWrapper.WechatClass.WECHAT_CLASS_CONTACTINFOUI)) {
@@ -53,7 +56,7 @@ public class AutoSendMsgService extends AccessibilityService {
                 } else if(currentActivity.equals(WeChatTextWrapper.WechatClass.WECHAT_CLASS_DELETE_CONFIRMUI)) {
                     handleFlow_Delete_ConfirmUI();
                 } else {
-                    Log.d(TAG, "onAccessibilityEvent: currentActivity=" + currentActivity.toString());
+                    Log.d(TAG, "onAccessibilityEvent: unhandle activity=" + currentActivity.toString());
                 }
             }
             break;
@@ -64,7 +67,7 @@ public class AutoSendMsgService extends AccessibilityService {
 
         //如果微信已经处于聊天界面，需要判断当前联系人是不是需要发送的联系人
         String curUserName = WechatUtils.findTextById(this, WeChatTextWrapper.WechatId.WECHATID_CHATUI_USERNAME_ID);
-        if (!TextUtils.isEmpty(curUserName) && curUserName.equals(WechatUtils.NAME)) {
+        if (!TextUtils.isEmpty(curUserName) && WechatUtils.names.contains(curUserName)) {
             if (WechatUtils.findViewByIdAndPasteContent(this, WeChatTextWrapper.WechatId.WECHATID_CHATUI_EDITTEXT_ID, WechatUtils.CONTENT)) {
                 sendContent();
             } else {
@@ -97,18 +100,29 @@ public class AutoSendMsgService extends AccessibilityService {
         WechatUtils.findViewIdAndClick(this, WeChatTextWrapper.WechatId.WECHATID_CONTACTINFO_MORE_ID); // 进入更多信息界面
     }
     private void handleFlow_ProfileSettingUI_for_delete() {
-        //如果微信已经处于资料设置界面，需要判断当前联系人是不是需要发送的联系人
-        String curUserName = WechatUtils.findTextById(this, WeChatTextWrapper.WechatId.WECHAT_PROFILESETTING_SUMMARY_ID);
-        if (!TextUtils.isEmpty(curUserName) && curUserName.equals(WechatUtils.NAME)) {
-            WechatUtils.findTextAndClick(this, "删除");
-        }
+        // 实测经常无法点击，多测试几次以保证成功
+        WechatUtils.sleep(300);
+        WechatUtils.findTextAndClick(AutoSendMsgService.this, "删除");
+        WechatUtils.sleep(100);
+        WechatUtils.findTextAndClick(AutoSendMsgService.this, "删除");
+        WechatUtils.sleep(100);
+        WechatUtils.findTextAndClick(AutoSendMsgService.this, "删除");
+        WechatUtils.sleep(100);
+        WechatUtils.findTextAndClick(AutoSendMsgService.this, "删除");
+        WechatUtils.sleep(100);
+        WechatUtils.findTextAndClick(AutoSendMsgService.this, "删除");
     }
     private void handleFlow_Delete_ConfirmUI() {
+        WechatUtils.sleep(300);
         // 弹出删除确认窗口，确认是否为需要删除的人
         String content = WechatUtils.findTextById(this, WeChatTextWrapper.WechatId.WECHAT_DELETE_CONFIRM_CONTENT_ID);
         final String targetContent = "将联系人“" + WechatUtils.NAME + "”删除，将同时删除与该联系人的聊天记录";
         if (!TextUtils.isEmpty(content) && content.equals(targetContent)) {
             WechatUtils.findTextAndClick(this, "删除"); // 确认删除
+            WechatUtils.sleep(100);
+            WechatUtils.findTextAndClick(this, "删除"); // 确认删除
+            WechatUtils.sleep(100);
+            WechatUtils.findViewIdAndClick(this, "com.tencent.mm:id/ghb");
         }
     }
 
@@ -176,9 +190,10 @@ public class AutoSendMsgService extends AccessibilityService {
                         AccessibilityNodeInfo itemInfo = itemList.get(i);
                         AccessibilityNodeInfo nodeInfo = nameList.get(i);
                         String nickname = nodeInfo.getText().toString();
-                        Log.d(TAG, "nickname = " + nickname);
                         if(status == Status.StatusDeleting){
                             if(WechatUtils.names.contains(nickname)) {
+                                WechatUtils.NAME = nickname; // 当前要删除的用户
+                                Log.d(TAG, "TraversalAndFindContacts: will delete user=" + nickname + "--------------------");
                                 return itemInfo; // 返回继续删除操作
                             }
                         } else {

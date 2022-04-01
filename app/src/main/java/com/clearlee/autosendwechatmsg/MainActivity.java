@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.UserHandle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
@@ -72,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     private void checkAndListContacts() {
         if(checkEnableService()){
             WechatUtils.names.clear();
+            WechatUtils.foundNames.clear();
             status = AutoSendMsgService.Status.StatusListing;
             new Thread(new Runnable() {
                 @Override

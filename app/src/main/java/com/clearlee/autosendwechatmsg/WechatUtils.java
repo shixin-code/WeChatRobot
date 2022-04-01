@@ -24,6 +24,14 @@ public class WechatUtils {
     public static Set<String> names = new HashSet<String>();
     public static Set<String> foundNames = new HashSet<String>();
 
+    public static void sleep(long m)
+    {
+        try {
+            Thread.sleep(m);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
     /**
      * 在当前页面查找文字内容并点击
      *
@@ -61,6 +69,7 @@ public class WechatUtils {
 
         AccessibilityNodeInfo accessibilityNodeInfo = accessibilityService.getRootInActiveWindow();
         if (accessibilityNodeInfo == null) {
+            Log.w(TAG, "findViewIdAndClick: cannot found root in active windows");
             return;
         }
 
@@ -69,10 +78,11 @@ public class WechatUtils {
             for (AccessibilityNodeInfo nodeInfo : nodeInfoList) {
                 if (nodeInfo != null) {
                     performClick(nodeInfo);
-                    break;
+                    return;
                 }
             }
         }
+        Log.w(TAG, "findViewIdAndClick: cannot found node with id=" + id);
     }
 
 
@@ -136,6 +146,7 @@ public class WechatUtils {
             return;
         }
         if (nodeInfo.isClickable()) {
+//            Log.d(TAG, "performClick: node=" + nodeInfo.toString());
             nodeInfo.performAction(AccessibilityNodeInfo.ACTION_CLICK);
         } else {
             performClick(nodeInfo.getParent());

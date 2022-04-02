@@ -7,10 +7,16 @@ import android.os.Message;
 import android.os.UserHandle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityManager;
+import android.widget.Adapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,9 +27,15 @@ import static com.clearlee.autosendwechatmsg.AutoSendMsgService.hasSend;
 import static com.clearlee.autosendwechatmsg.AutoSendMsgService.status;
 import static com.clearlee.autosendwechatmsg.WechatUtils.CONTENT;
 import static com.clearlee.autosendwechatmsg.WechatUtils.NAME;
+import static com.clearlee.autosendwechatmsg.WechatUtils.findTextById;
+import static com.clearlee.autosendwechatmsg.WechatUtils.foundNames;
+import static com.clearlee.autosendwechatmsg.WechatUtils.names;
+
+import org.w3c.dom.Text;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 /**
  * Created by Clearlee
@@ -31,13 +43,55 @@ import java.util.HashSet;
  */
 public class MainActivity extends AppCompatActivity {
 
+    private RecyclerView nameListView;
+    private DataAdapter nameAdapter;
     private Button btnListContacts, btnDeleteContacts;
     private EditText contactsList;
-    private TextView start, sendStatus;
-    private EditText sendName, sendContent;
     private AccessibilityManager accessibilityManager;
-    private String name, content;
+    private CheckBox selectAll;
+    private TextView listTitle;
 
+    class DataViewHodler extends RecyclerView.ViewHolder {
+        TextView content;
+        CheckBox selected;
+        public DataViewHodler(View itemView) {
+            super(itemView);
+            content = itemView.findViewById(R.id.item_text);
+            selected = itemView.findViewById(R.id.selected);
+        }
+    }
+    class DataAdapter extends RecyclerView.Adapter<DataViewHodler> {
+
+        @Override
+        public DataViewHodler onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = View.inflate(MainActivity.this, R.layout.list_item, null);
+            DataViewHodler holder = new DataViewHodler(view);
+            return holder;
+        }
+
+        @Override
+        public void onBindViewHolder(DataViewHodler holder, int position) {
+            final String name = foundNames.get(position);
+            holder.content.setText(name);
+            holder.selected.setChecked(names.contains(name));
+            holder.selected.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(names.contains(name)){
+                        names.remove(name);
+                    } else {
+                        names.add(name);
+                    }
+                    notifyDataSetChanged();
+                }
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return foundNames.size();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,13 +101,41 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init() {
+        for(int i = 0; i < 10; ++i) {
+            foundNames.add("item" + i);
+        }
+        nameListView = (RecyclerView)findViewById(R.id.nameListView);
+        nameAdapter = new DataAdapter();
+        nameListView.setAdapter(nameAdapter);
+        LinearLayoutManager layout = new LinearLayoutManager(MainActivity.this);
+        nameListView.setLayoutManager(layout);
+
+        listTitle = (TextView)findViewById(R.id.listTitle);
+        selectAll = (CheckBox)findViewById(R.id.selectAll);
+        selectAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(names.isEmpty()) {
+                    names = foundNames.stream().collect(Collectors.<String>toSet());
+                } else {
+                    names.clear();
+                }
+                nameAdapter.notifyDataSetChanged();
+            }
+        });
+        nameAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                listTitle.setText(String.format("联系人 %d/%d", names.size(), foundNames.size()));
+                selectAll.setChecked(names.size() == foundNames.size());
+            }
+        });
+        listTitle.setText(String.format("联系人 %d/%d", names.size(), foundNames.size()));
+
         contactsList = (EditText)findViewById(R.id.contactsList);
         btnListContacts = (Button)findViewById(R.id.btnListContacts);
         btnDeleteContacts = (Button)findViewById(R.id.btnDeleteContacts);
-
-        sendName = (EditText) findViewById(R.id.sendName);
-        sendContent = (EditText) findViewById(R.id.sendContent);
-        sendStatus = (TextView) findViewById(R.id.sendStatus);
 
         btnListContacts.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
 
     private int goWechat(AutoSendMsgService.Status reason) {
         try {
-            setValue(name, content);
+//            setValue(name, content);
             hasSend = false;
             Intent intent = new Intent();
             intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
@@ -168,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
         if(reason == AutoSendMsgService.Status.StatusListing.ordinal()){
             String content = String.join("\n", WechatUtils.foundNames);
             contactsList.setText(content);
+            nameAdapter.notifyDataSetChanged();
         } else if(reason == AutoSendMsgService.Status.StatusDeleting.ordinal()) {
 
         }
@@ -175,9 +258,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setSendStatusText(int status) {
         if (status == SEND_SUCCESS) {
-            sendStatus.setText("微信发送成功");
         } else {
-            sendStatus.setText("微信发送失败");
         }
     }
 

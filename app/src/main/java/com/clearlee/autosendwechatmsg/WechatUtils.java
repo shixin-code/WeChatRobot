@@ -22,7 +22,7 @@ public class WechatUtils {
     public static String NAME;
     public static String CONTENT;
     public static Set<String> names = new HashSet<String>();
-    public static Set<String> foundNames = new HashSet<String>();
+    public static List<String> foundNames = new ArrayList<>();
 
     public static void sleep(long m)
     {

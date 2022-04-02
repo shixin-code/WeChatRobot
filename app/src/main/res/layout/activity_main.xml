@@ -5,76 +5,27 @@
     android:orientation="vertical">
 
     <RelativeLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:paddingLeft="9dp"
-        android:paddingRight="9dp">
-
+        android:layout_height="wrap_content">
         <TextView
-            android:id="@+id/wechatName"
+            android:id="@+id/listTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:text="微信好友:" />
-
-        <EditText
-            android:id="@+id/sendName"
-            android:text="菁9385"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_toRightOf="@+id/wechatName"
-            />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:paddingLeft="9dp"
-        android:paddingRight="9dp">
-
-        <TextView
-            android:id="@+id/wechatContent"
+            android:textSize="20dp"
+            android:layout_alignParentLeft="true"/>
+        <CheckBox
+            android:id="@+id/selectAll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:text="发送内容:" />
-
-
-        <EditText
-            android:id="@+id/sendContent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_toRightOf="@+id/wechatContent"
-            android:text="测试发微信" />
-
+            android:layout_alignParentRight="true"/>
     </RelativeLayout>
 
-    <RelativeLayout
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/nameListView"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:paddingLeft="9dp"
-        android:paddingRight="9dp">
-
-        <TextView
-            android:id="@+id/wechatStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:text="发送状态:" />
-
-
-        <TextView
-            android:id="@+id/sendStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp"
-            android:layout_toRightOf="@+id/wechatStatus" />
-
-    </RelativeLayout>
+        android:layout_height="wrap_content"
+        android:minHeight="50dp"/>
 
     <TextView
         android:layout_width="match_parent"

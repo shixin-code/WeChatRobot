@@ -196,7 +196,7 @@ public class AutoSendMsgService extends AccessibilityService {
                                 Log.d(TAG, "TraversalAndFindContacts: will delete user=" + nickname + "--------------------");
                                 return itemInfo; // 返回继续删除操作
                             }
-                        } else {
+                        } else if(!WechatUtils.foundNames.contains(nickname)){
                             WechatUtils.foundNames.add(nickname);
                         }
 

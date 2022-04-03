@@ -1,4 +1,4 @@
-package com.clearlee.autosendwechatmsg;
+package com.clearlee.wechatrobot;
 
 import org.junit.Test;
 

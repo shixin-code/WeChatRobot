@@ -1,4 +1,4 @@
-package com.clearlee.autosendwechatmsg;
+package com.clearlee.wechatrobot;
 
 import android.accessibilityservice.AccessibilityService;
 import android.os.Build;
@@ -19,7 +19,7 @@ import java.util.Set;
 public class WechatUtils {
 
     private static final String TAG = "WechatUtils";
-    public static String NAME;
+    public static String currentName;
     public static String CONTENT;
     public static Set<String> names = new HashSet<String>();
     public static List<String> foundNames = new ArrayList<>();

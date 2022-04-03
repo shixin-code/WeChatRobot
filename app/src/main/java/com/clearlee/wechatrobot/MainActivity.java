@@ -1,37 +1,29 @@
-package com.clearlee.autosendwechatmsg;
+package com.clearlee.wechatrobot;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.UserHandle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityManager;
-import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static com.clearlee.autosendwechatmsg.AutoSendMsgService.SEND_STATUS;
-import static com.clearlee.autosendwechatmsg.AutoSendMsgService.SEND_SUCCESS;
-import static com.clearlee.autosendwechatmsg.AutoSendMsgService.hasSend;
-import static com.clearlee.autosendwechatmsg.AutoSendMsgService.status;
-import static com.clearlee.autosendwechatmsg.WechatUtils.CONTENT;
-import static com.clearlee.autosendwechatmsg.WechatUtils.NAME;
-import static com.clearlee.autosendwechatmsg.WechatUtils.findTextById;
-import static com.clearlee.autosendwechatmsg.WechatUtils.foundNames;
-import static com.clearlee.autosendwechatmsg.WechatUtils.names;
-
-import org.w3c.dom.Text;
+import static com.clearlee.wechatrobot.WeChatRobotService.SEND_SUCCESS;
+import static com.clearlee.wechatrobot.WeChatRobotService.hasSend;
+import static com.clearlee.wechatrobot.WeChatRobotService.status;
+import static com.clearlee.wechatrobot.WechatUtils.CONTENT;
+import static com.clearlee.wechatrobot.WechatUtils.currentName;
+import static com.clearlee.wechatrobot.WechatUtils.foundNames;
+import static com.clearlee.wechatrobot.WechatUtils.names;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -46,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView nameListView;
     private DataAdapter nameAdapter;
     private Button btnListContacts, btnDeleteContacts;
-    private EditText contactsList;
     private AccessibilityManager accessibilityManager;
     private CheckBox selectAll;
     private TextView listTitle;
@@ -133,21 +124,20 @@ public class MainActivity extends AppCompatActivity {
         });
         listTitle.setText(String.format("联系人 %d/%d", names.size(), foundNames.size()));
 
-        contactsList = (EditText)findViewById(R.id.contactsList);
         btnListContacts = (Button)findViewById(R.id.btnListContacts);
         btnDeleteContacts = (Button)findViewById(R.id.btnDeleteContacts);
 
         btnListContacts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                status = AutoSendMsgService.Status.StatusListing;
+                status = WeChatRobotService.Status.StatusListing;
                 checkAndListContacts();
             }
         });
         btnDeleteContacts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                status = AutoSendMsgService.Status.StatusDeleting;
+                status = WeChatRobotService.Status.StatusDeleting;
                 checkAndDeleteContacts();
             }
         });
@@ -157,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         if(checkEnableService()){
             WechatUtils.names.clear();
             WechatUtils.foundNames.clear();
-            status = AutoSendMsgService.Status.StatusListing;
+            status = WeChatRobotService.Status.StatusListing;
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -170,14 +160,12 @@ public class MainActivity extends AppCompatActivity {
     private void checkAndDeleteContacts() {
         if(!checkEnableService())
             return;
-        String content = contactsList.getText().toString();
-        WechatUtils.names = new HashSet<String>(Arrays.asList(content.split("\n")));
         if(WechatUtils.names.isEmpty()){
             Toast.makeText(MainActivity.this, "联系人列表不能为空！", Toast.LENGTH_SHORT);
             return;
         }
 
-        status = AutoSendMsgService.Status.StatusDeleting;
+        status = WeChatRobotService.Status.StatusDeleting;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -186,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
-    private int goWechat(AutoSendMsgService.Status reason) {
+    private int goWechat(WeChatRobotService.Status reason) {
         try {
 //            setValue(name, content);
             hasSend = false;
@@ -196,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
 
             while (true) {
-                if (status.equals(AutoSendMsgService.Status.StatusNone)) {
+                if (status.equals(WeChatRobotService.Status.StatusNone)) {
                     return reason.ordinal();
                 } else {
                     try {
@@ -210,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return AutoSendMsgService.Status.StatusNone.ordinal();
+            return WeChatRobotService.Status.StatusNone.ordinal();
         }
     }
 
@@ -247,11 +235,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void handleResult(int reason)
     {
-        if(reason == AutoSendMsgService.Status.StatusListing.ordinal()){
-            String content = String.join("\n", WechatUtils.foundNames);
-            contactsList.setText(content);
+        if(reason == WeChatRobotService.Status.StatusListing.ordinal()){
             nameAdapter.notifyDataSetChanged();
-        } else if(reason == AutoSendMsgService.Status.StatusDeleting.ordinal()) {
+        } else if(reason == WeChatRobotService.Status.StatusDeleting.ordinal()) {
 
         }
     }
@@ -263,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setValue(String name, String content) {
-        NAME = name;
+        currentName = name;
         CONTENT = content;
         hasSend = false;
     }

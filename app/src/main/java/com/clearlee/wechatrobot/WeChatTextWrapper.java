@@ -1,4 +1,4 @@
-package com.clearlee.autosendwechatmsg;
+package com.clearlee.wechatrobot;
 
 /**
  * Created by Clearlee on 2017/12/22 0023.

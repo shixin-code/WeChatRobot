@@ -25,21 +25,8 @@
         android:id="@+id/nameListView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="50dp"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="联系人列表" />
-
-    <EditText
-        android:id="@+id/contactsList"
-        android:minLines="10"
-        android:gravity="top"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:layout_weight="1"
-        />
+        android:minHeight="50dp"/>
 
     <LinearLayout
         android:orientation="horizontal"

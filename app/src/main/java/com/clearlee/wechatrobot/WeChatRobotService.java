@@ -20,6 +20,7 @@ public class WeChatRobotService extends AccessibilityService {
     private static final String TAG = "WeChatRobotService";
     private List<String> allNameList = new ArrayList<>();
     private int mRepeatCount;
+    private int dismatchCount = 0;
 
     enum Status {
         StatusNone, StatusListing, StatusDeleting
@@ -56,6 +57,10 @@ public class WeChatRobotService extends AccessibilityService {
                     handleFlow_Delete_ConfirmUI();
                 } else {
                     Log.d(TAG, "onAccessibilityEvent: unhandle activity=" + currentActivity.toString());
+                    if(++dismatchCount > 10) {
+                        dismatchCount = 0;
+                        resetAndReturnApp();
+                    }
                 }
             }
             break;
@@ -144,14 +149,12 @@ public class WeChatRobotService extends AccessibilityService {
             //遍历通讯录联系人列表，查找联系人
             AccessibilityNodeInfo itemInfo = TraversalAndFindContacts();
             if (status.equals(Status.StatusListing)) {
-                status = Status.StatusNone;
                 resetAndReturnApp();
                 return;
             }
             if (itemInfo != null) {
                 WechatUtils.performClick(itemInfo);
             } else {
-                SEND_STATUS = SEND_FAIL;
                 resetAndReturnApp();
             }
 
@@ -241,12 +244,11 @@ public class WeChatRobotService extends AccessibilityService {
 
     private void sendContent() {
         WechatUtils.findTextAndClick(this, "发送");
-        SEND_STATUS = SEND_SUCCESS;
         resetAndReturnApp();
     }
 
     private void resetAndReturnApp() {
-        hasSend = true;
+        status = Status.StatusNone;
         ActivityManager activtyManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningTaskInfo> runningTaskInfos = activtyManager.getRunningTasks(3);
         for (ActivityManager.RunningTaskInfo runningTaskInfo : runningTaskInfos) {

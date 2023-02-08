@@ -7,6 +7,10 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityManager;
@@ -35,6 +39,7 @@ import java.util.stream.Collectors;
  */
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
     private RecyclerView nameListView;
     private DataAdapter nameAdapter;
     private Button btnListContacts, btnDeleteContacts;
@@ -91,7 +96,15 @@ public class MainActivity extends AppCompatActivity {
         init();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Log.d(TAG, "onCreateOptionsMenu!");
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
     private void init() {
+
         for(int i = 0; i < 10; ++i) {
             foundNames.add("item" + i);
         }
@@ -139,6 +152,15 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 status = WeChatRobotService.Status.StatusDeleting;
                 checkAndDeleteContacts();
+            }
+        });
+
+        Toolbar tb = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(tb);
+        tb.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                return false;
             }
         });
     }

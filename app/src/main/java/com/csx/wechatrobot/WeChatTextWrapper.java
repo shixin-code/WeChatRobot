@@ -1,4 +1,4 @@
-package com.clearlee.wechatrobot;
+package com.csx.wechatrobot;
 
 /**
  * Created by Clearlee on 2017/12/22 0023.

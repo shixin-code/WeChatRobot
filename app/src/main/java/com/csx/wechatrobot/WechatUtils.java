@@ -1,4 +1,4 @@
-package com.clearlee.wechatrobot;
+package com.csx.wechatrobot;
 
 import android.accessibilityservice.AccessibilityService;
 import android.os.Build;

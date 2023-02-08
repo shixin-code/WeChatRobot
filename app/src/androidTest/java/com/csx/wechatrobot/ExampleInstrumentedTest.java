@@ -1,4 +1,4 @@
-package com.clearlee.wechatrobot;
+package com.csx.wechatrobot;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

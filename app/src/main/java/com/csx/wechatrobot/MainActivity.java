@@ -1,4 +1,4 @@
-package com.clearlee.wechatrobot;
+package com.csx.wechatrobot;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,21 +16,18 @@ import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityManager;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static com.clearlee.wechatrobot.WeChatRobotService.SEND_SUCCESS;
-import static com.clearlee.wechatrobot.WeChatRobotService.hasSend;
-import static com.clearlee.wechatrobot.WeChatRobotService.status;
-import static com.clearlee.wechatrobot.WechatUtils.CONTENT;
-import static com.clearlee.wechatrobot.WechatUtils.currentName;
-import static com.clearlee.wechatrobot.WechatUtils.foundNames;
-import static com.clearlee.wechatrobot.WechatUtils.names;
+import static com.csx.wechatrobot.WeChatRobotService.SEND_SUCCESS;
+import static com.csx.wechatrobot.WeChatRobotService.hasSend;
+import static com.csx.wechatrobot.WeChatRobotService.status;
+import static com.csx.wechatrobot.WechatUtils.CONTENT;
+import static com.csx.wechatrobot.WechatUtils.currentName;
+import static com.csx.wechatrobot.WechatUtils.foundNames;
+import static com.csx.wechatrobot.WechatUtils.names;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.stream.Collectors;
 
 /**

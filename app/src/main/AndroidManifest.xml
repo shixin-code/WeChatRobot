@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.clearlee.wechatrobot">
+    package="com.csx.wechatrobot">
 
     <uses-permission android:name="android.permission.REORDER_TASKS" />
 
@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name="com.clearlee.wechatrobot.MainActivity"
+        <activity android:name="com.csx.wechatrobot.MainActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,7 +22,7 @@
         </activity>
 
         <service
-            android:name="com.clearlee.wechatrobot.WeChatRobotService"
+            android:name="com.csx.wechatrobot.WeChatRobotService"
             android:enabled="true"
             android:exported="true"
             android:label="@string/app_name"

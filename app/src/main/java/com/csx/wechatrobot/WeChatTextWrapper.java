@@ -28,9 +28,9 @@ public class WeChatTextWrapper {
         /**
          * 通讯录界面
          */
-        public static final String WECHATID_CONTACTUI_LISTVIEW_ID = "com.tencent.mm:id/jc";
-        public static final String WECHATID_CONTACTUI_ITEM_ID = "com.tencent.mm:id/bn6";
-        public static final String WECHATID_CONTACTUI_NAME_ID = "com.tencent.mm:id/gw6";
+        public static final String WECHATID_CONTACTUI_LISTVIEW_ID = "com.tencent.mm:id/kz"; // RecycleView
+        public static final String WECHATID_CONTACTUI_ITEM_ID = "com.tencent.mm:id/ixm";
+        public static final String WECHATID_CONTACTUI_NAME_ID = "com.tencent.mm:id/ixm"; // TextView
 
         /**
          * 聊天界面
@@ -44,13 +44,15 @@ public class WeChatTextWrapper {
         /**
          * 用户信息界面
          */
-        public static final String WECHATID_CONTACTINFO_MORE_ID = "com.tencent.mm:id/eh";
+        public static final String WECHATID_CONTACTINFO_MORE_ID = "com.tencent.mm:id/f9";
 
         /**
          * 资料设置界面
          */
         public static final String WECHAT_PROFILESETTING_SUMMARY_ID = "android:id/summary";
-        public static final String WECHAT_DELETE_CONFIRM_CONTENT_ID = "com.tencent.mm:id/gh3";
+
+        public static final String WECHAT_PROFILESETTING_DELETE_BUTTON_ID = "com.tencent.mm:id/m91"; // TextView 资料设置界面的删除按钮
+        public static final String WECHAT_DELETE_CONFIRM_CONTENT_ID = "com.tencent.mm:id/i9e"; // 确认删除窗口的删除按钮id
     }
 
 }

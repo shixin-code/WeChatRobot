@@ -65,12 +65,12 @@ public class WechatUtils {
      * @param accessibilityService
      * @param id
      */
-    public static void findViewIdAndClick(AccessibilityService accessibilityService, String id) {
+    public static AccessibilityNodeInfo findViewIdAndClick(AccessibilityService accessibilityService, String id) {
 
         AccessibilityNodeInfo accessibilityNodeInfo = accessibilityService.getRootInActiveWindow();
         if (accessibilityNodeInfo == null) {
             Log.w(TAG, "findViewIdAndClick: cannot found root in active windows");
-            return;
+            return null;
         }
 
         List<AccessibilityNodeInfo> nodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId(id);
@@ -78,11 +78,12 @@ public class WechatUtils {
             for (AccessibilityNodeInfo nodeInfo : nodeInfoList) {
                 if (nodeInfo != null) {
                     performClick(nodeInfo);
-                    return;
+                    return nodeInfo;
                 }
             }
         }
         Log.w(TAG, "findViewIdAndClick: cannot found node with id=" + id);
+        return null;
     }
 
 

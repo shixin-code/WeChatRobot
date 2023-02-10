@@ -105,8 +105,14 @@ public class WeChatRobotService extends AccessibilityService {
     }
 
     private void handleFlow_ProfileSettingUI_for_delete() {
+        AccessibilityNodeInfo nodeInfo = WechatUtils.findViewIdAndClick(
+                WeChatRobotService.this,
+                WeChatTextWrapper.WechatId.WECHAT_PROFILESETTING_DELETE_BUTTON_ID);
+        if(nodeInfo != null)
+            Log.d(TAG, "found view node " + nodeInfo.getClassName() + " on id "
+                    + WeChatTextWrapper.WechatId.WECHAT_PROFILESETTING_DELETE_BUTTON_ID);
         // 实测经常无法点击，多测试几次以保证成功
-        WechatUtils.sleep(300);
+        /*WechatUtils.sleep(300);
         WechatUtils.findTextAndClick(WeChatRobotService.this, "删除");
         WechatUtils.sleep(100);
         WechatUtils.findTextAndClick(WeChatRobotService.this, "删除");
@@ -115,7 +121,7 @@ public class WeChatRobotService extends AccessibilityService {
         WechatUtils.sleep(100);
         WechatUtils.findTextAndClick(WeChatRobotService.this, "删除");
         WechatUtils.sleep(100);
-        WechatUtils.findTextAndClick(WeChatRobotService.this, "删除");
+        WechatUtils.findTextAndClick(WeChatRobotService.this, "删除");*/
     }
 
     private void handleFlow_Delete_ConfirmUI() {
@@ -173,7 +179,8 @@ public class WeChatRobotService extends AccessibilityService {
         if (allNameList != null) allNameList.clear();
 
         AccessibilityNodeInfo rootNode = getRootInActiveWindow();
-        List<AccessibilityNodeInfo> listview = rootNode.findAccessibilityNodeInfosByViewId(WeChatTextWrapper.WechatId.WECHATID_CONTACTUI_LISTVIEW_ID);
+        List<AccessibilityNodeInfo> listview = rootNode.findAccessibilityNodeInfosByViewId(
+                WeChatTextWrapper.WechatId.WECHATID_CONTACTUI_LISTVIEW_ID);
 
         //是否滚动到了底部
         boolean scrollToBottom = false;
@@ -181,8 +188,10 @@ public class WeChatRobotService extends AccessibilityService {
             Log.d(TAG, "TraversalAndFindContacts: listview size=" + listview.size());
             while (true) {
                 //获取当前屏幕上的联系人信息
-                List<AccessibilityNodeInfo> nameList = rootNode.findAccessibilityNodeInfosByViewId(WeChatTextWrapper.WechatId.WECHATID_CONTACTUI_NAME_ID);
-                List<AccessibilityNodeInfo> itemList = rootNode.findAccessibilityNodeInfosByViewId(WeChatTextWrapper.WechatId.WECHATID_CONTACTUI_ITEM_ID);
+                List<AccessibilityNodeInfo> nameList = rootNode.findAccessibilityNodeInfosByViewId(
+                        WeChatTextWrapper.WechatId.WECHATID_CONTACTUI_NAME_ID);
+                List<AccessibilityNodeInfo> itemList = rootNode.findAccessibilityNodeInfosByViewId(
+                        WeChatTextWrapper.WechatId.WECHATID_CONTACTUI_ITEM_ID);
 
                 if (nameList != null && !nameList.isEmpty()) {
                     Log.w(TAG, "TraversalAndFindContacts: nameList size=" + nameList.size());
@@ -205,10 +214,12 @@ public class WeChatRobotService extends AccessibilityService {
                         }
 
                         if (!allNameList.contains(nickname)) {
+                            Log.i(TAG, "add nickname: " + nickname);
                             allNameList.add(nickname);
                         } else {
-                            Log.d(TAG, "mRepeatCount = " + mRepeatCount);
-                            if (mRepeatCount == 3) {
+                            Log.d(TAG, "found same nickname " + nickname + " Count " + mRepeatCount);
+                            if (mRepeatCount + 1== nameList.size()) {
+                                Log.i(TAG, "Has scroll the list bottom!");
                                 //表示已经滑动到底部了
                                 if (scrollToBottom) {
                                     return null;
@@ -224,7 +235,10 @@ public class WeChatRobotService extends AccessibilityService {
 
                 if (!scrollToBottom) {
                     //向下滚动
-                    listview.get(0).performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
+                    AccessibilityNodeInfo view = listview.get(0);
+                    Log.d(TAG, "scroll contact list: " + view.getClassName() + "...");
+//                    view.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD  );
+                    view.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_FORWARD.getId());
                 } else {
                     return null;
                 }
